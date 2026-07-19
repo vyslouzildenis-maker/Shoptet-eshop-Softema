@@ -1,26 +1,22 @@
 <!-- ============================================================
-     SOFTEMA — kód do HTML editoru Shoptetu
-     Administrace → Vzhled a obsah → Editor HTML kódu → HLAVIČKA
+     SOFTEMA — nasazení do Shoptetu (spolehlivá varianta)
      ------------------------------------------------------------
-     Vlož CELÝ blok níže. Nahraď:
-       • USERNAME/REPO@TAG za svůj GitHub + vydaný tag (viz níže)
-       • po dodání loga: --sc-acc hodnotu za brand hex
+     Editor HTML kódu:
+       • ZÁHLAVÍ (před </head>)  = NECH PRÁZDNÉ
+       • ZÁPATÍ  (před </body>)  = vlož POUZE blok níže
+     Proč: pole Záhlaví v editoru ukusuje „<" u <link>. Tenhle
+     loader načte fonty i CSS z JS, takže žádné <link> v Záhlaví
+     není potřeba a nic se nerozbije.
      ============================================================ -->
-
-<!-- 1) Fonty (kolize K5 — nejsou v nabídce administrace) -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- 2) Custom CSS vrstva (přes jsDelivr z GitHubu) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/USERNAME/REPO@TAG/deploy/custom.css">
-
-<!-- 3) (volitelné) rychlé přepsání akcentu bez rebuildu CSS -->
-<style>
-  :root { --sc-acc: #0E62D9; --sc-acc-hover: #0B4FB0; }
-</style>
-
-<!-- ============================================================
-     Do PATIČKY (konec <body>) vlož skript:
-     ============================================================ -->
-<script defer src="https://cdn.jsdelivr.net/gh/USERNAME/REPO@TAG/deploy/custom.js"></script>
+<script>
+(function () {
+  var base = "https://cdn.jsdelivr.net/gh/vyslouzildenis-maker/Shoptet-eshop-Softema@main/";
+  function css(href){ var l=document.createElement("link"); l.rel="stylesheet"; l.href=href; document.head.appendChild(l); }
+  css("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap");
+  css(base + "custom.css");
+  var s = document.createElement("script");
+  s.defer = true;
+  s.src = base + "custom.js";
+  document.body.appendChild(s);
+})();
+</script>
