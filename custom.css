@@ -162,18 +162,16 @@ textarea:focus-visible,
 }
 .p .p-in { padding: 18px; }
 .p .p-images { border-bottom: 1px solid var(--sc-line); }
+/* Karta produktu — název a cena (reálné třídy Shoptet výpisu) */
 .p .name,
-.p .p-name {
+.p .p-name,
+.products-block .p .name {
   font-family: var(--sc-font-head);
   font-size: 19px;
   font-weight: 600;
 }
 .p .price,
-.p .price-final {
-  color: var(--sc-acc);
-  font-weight: 700;
-  font-size: 19px;
-}
+.p .price-final { color: var(--sc-acc); font-weight: 700; font-size: 19px; }
 
 /* „Živé okno" — rám kolem náhledu (obal .sc-frame přidá JS,
    fallback: přímo na .p-images) */
@@ -203,6 +201,19 @@ textarea:focus-visible,
   transition: transform 4s ease;
 }
 .sc-frame:hover .sc-frame__shot img { transform: translateY(calc(-100% + 200px)); }
+
+/* Živé okno na detailu produktu (kolem .p-image) */
+.sc-frame--detail .p-image,
+.sc-frame--detail .p-main-image { margin: 0; border: 0; }
+.sc-frame__live {
+  font-size: 11px; font-weight: 700; letter-spacing: .6px;
+  color: var(--sc-success); display: inline-flex; align-items: center; gap: 6px;
+}
+.sc-frame__live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--sc-success); }
+
+/* Řádek Živé demo + pilulka pod cenou */
+.sc-detail-demo { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 12px 0 4px; }
+.sc-detail-demo .sc-demo { padding: 11px 20px; border-radius: var(--sc-r-btn); }
 
 /* Pilulka „vč. nasazení" u ceny */
 .sc-pill {
@@ -248,12 +259,28 @@ textarea:focus-visible,
 .pagination .active,
 .pagination a:hover { background: var(--sc-acc); color: #fff; border-color: var(--sc-acc); }
 
-/* ---------- 8. DETAIL PRODUKTU ---------------------------- */
-.p-detail .p-detail-inner { gap: clamp(28px, 4vw, 56px); }
-.p-detail .price-final,
-.p-detail .price { color: var(--sc-acc); }
+/* ---------- 8. DETAIL PRODUKTU (reálné třídy Samby) ------- */
+.p-detail-inner { gap: clamp(28px, 4vw, 56px); }
+.p-data-wrapper h1,
+.p-detail-inner-header-mobile .h1 { font-family: var(--sc-font-head); letter-spacing: -0.3px; }
 
-/* Checklist „Co je v ceně" (blok .sc-included v popisu) */
+/* Cena */
+.price-final,
+.price-final-holder,
+.p-price-wrapper .price-final { color: var(--sc-acc); }
+.p-price-wrapper .price-final { font-size: clamp(30px, 4vw, 40px); }
+
+/* Dostupnost — Shoptet dává inline barvu, sjednoťme na zelenou */
+.availability-label[style] { color: var(--sc-success) !important; font-weight: 700; }
+
+/* Ovladač množství (.quantity .amount, .increase/.decrease) */
+.quantity .amount { background: var(--sc-fog); border: 1px solid var(--sc-line); border-radius: 8px; min-height: 48px; }
+.quantity .increase,
+.quantity .decrease { background: var(--sc-fog); border: 1px solid var(--sc-line); border-radius: 8px; color: var(--sc-ink); }
+.quantity .increase:hover,
+.quantity .decrease:hover { border-color: var(--sc-acc); color: var(--sc-acc); }
+
+/* Checklist „Co je v ceně" (blok .sc-included v .basic-description) */
 .sc-included { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .sc-included li { display: flex; gap: 12px; align-items: flex-start; }
 .sc-included li::before {
@@ -264,9 +291,20 @@ textarea:focus-visible,
   font-size: 13px;
 }
 
-/* Taby detailu */
-.p-detail .tabs .tab.active,
-.detail-tabs .active { color: var(--sc-acc); border-bottom-color: var(--sc-acc); }
+/* Taby detailu (.shp-tabs / .shp-tab / .shp-tab-link) */
+.shp-tabs { border-bottom: 1px solid var(--sc-line); }
+.shp-tab-link { color: var(--sc-steel); font-weight: 500; }
+.shp-tab.active .shp-tab-link,
+.shp-tab-link:hover { color: var(--sc-acc); }
+.shp-tab.active .shp-tab-link { border-bottom: 2px solid var(--sc-acc); }
+.description-inner h4,
+.basic-description h4 { font-family: var(--sc-font-head); font-size: 20px; }
+
+/* Hodnocení hvězdami */
+.stars .star.star-on,
+.star-list .star-on { color: var(--sc-acc); }
+.starsLabel--productDetail a,
+.js-ratingDialogTrigger { color: var(--sc-acc); }
 
 /* Sticky nákupní lišta (přidá product.js) */
 .sc-buybar {

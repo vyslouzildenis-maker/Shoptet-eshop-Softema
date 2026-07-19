@@ -129,11 +129,11 @@
       if (p.getAttribute("data-sc") === "card") return;
       mark(p, "card");
 
-      // Živé okno kolem náhledu
-      var img = p.querySelector(".p-images, .image");
+      // Živé okno kolem náhledu (Shoptet výpis: .p .image / .p-image)
+      var img = p.querySelector(".image, .p-image, .p-images");
       if (img && !img.closest(".sc-frame")) {
         var frame = el("div", "sc-frame");
-        var demo = p.querySelector("[data-demo]");
+        var demo = p.querySelector(".p-short-description [data-demo], [data-demo]");
         var url = demo ? demo.getAttribute("data-demo") : "demo.softema.cz";
         frame.appendChild(el("div", "sc-frame__bar",
           '<span class="sc-frame__dots"><i></i><i></i></span><span class="sc-frame__url">' + esc(url) + '</span>'));
@@ -143,13 +143,12 @@
         frame.appendChild(shot);
       }
 
-      // Tlačítko Živé demo z data-demo
-      var demoSpan = p.querySelector("[data-demo]");
+      // Tlačítko Živé demo z data-demo (.p-short-description)
+      var demoSpan = p.querySelector(".p-short-description [data-demo], [data-demo]");
       if (demoSpan) {
         var href = demoSpan.getAttribute("data-demo");
-        var actions = p.querySelector(".p-bottom, .p-in") || p;
-        var a = el("a", "btn btn-primary sc-demo",
-          "Živé demo");
+        var actions = p.querySelector(".p-bottom, .price-wrapper, .p-in") || p;
+        var a = el("a", "btn btn-primary sc-demo", "Živé demo");
         a.href = href.indexOf("http") === 0 ? href : "https://" + href;
         a.target = "_blank"; a.rel = "noopener";
         a.style.marginTop = "8px";
@@ -183,44 +182,52 @@
      DETAIL PRODUKTU — Živé demo z parametru + sticky lišta
      ============================================================ */
   function product() {
-    // Tlačítko Živé demo z doplňkového parametru „Demo"
+    // Demo URL: skrytý <span data-demo> v krátkém popisu (.p-short-description)
+    var demoSpan = document.querySelector(".p-short-description [data-demo], .p-detail [data-demo]");
+    var demoUrl = demoSpan ? demoSpan.getAttribute("data-demo") : null;
+    var demoHref = demoUrl ? (demoUrl.indexOf("http") === 0 ? demoUrl : "https://" + demoUrl) : null;
+
+    // „Živé okno" kolem hlavního obrázku
+    if (demoUrl && once("detail-frame")) {
+      var pimg = document.querySelector(".p-image");
+      if (pimg && !pimg.closest(".sc-frame")) {
+        var frame = mark(el("div", "sc-frame sc-frame--detail"), "detail-frame");
+        frame.appendChild(el("div", "sc-frame__bar",
+          '<span class="sc-frame__dots"><i></i><i></i><i></i></span>' +
+          '<span class="sc-frame__url">' + esc(demoUrl) + '</span>' +
+          '<span class="sc-frame__live">ŽIVÉ DEMO</span>'));
+        pimg.parentNode.insertBefore(frame, pimg);
+        frame.appendChild(pimg);
+      }
+    }
+
+    // Tlačítko „Živé demo" + pilulka „vč. nasazení" pod cenou
     if (once("detail-demo")) {
-      var rows = document.querySelectorAll(".detail-parameters tr, .product-parameters tr, .parameters tr");
-      Array.prototype.forEach.call(rows, function (tr) {
-        var label = (tr.textContent || "").toLowerCase();
-        if (label.indexOf("demo") !== -1) {
-          var link = tr.querySelector("a");
-          var url = link ? link.href : (tr.querySelector("td:last-child") || {}).textContent;
-          if (url) {
-            var host = document.querySelector(".p-detail .price-final, .product-detail .prices") || document.querySelector(".p-detail");
-            if (host) {
-              var a = mark(el("a", "btn btn-primary sc-demo", "Živé demo →"), "detail-demo");
-              a.href = String(url).indexOf("http") === 0 ? url : "https://" + String(url).trim();
-              a.target = "_blank"; a.rel = "noopener";
-              a.style.marginTop = "12px"; a.style.display = "inline-flex";
-              host.parentNode.insertBefore(a, host.nextSibling);
-            }
-          }
-          tr.style.display = "none";
-        }
-      });
+      var priceWrap = document.querySelector(".p-price-wrapper");
+      if (priceWrap) {
+        var box = mark(el("div", "sc-detail-demo"), "detail-demo");
+        var pill = '<span class="sc-pill">vč. nasazení</span>';
+        var demoBtn = demoHref
+          ? '<a class="btn btn-primary sc-demo" href="' + esc(demoHref) + '" target="_blank" rel="noopener">Živé demo →</a>'
+          : "";
+        box.innerHTML = demoBtn + pill;
+        priceWrap.parentNode.insertBefore(box, priceWrap.nextSibling);
+      }
     }
 
     // Sticky nákupní lišta (hlavně mobil)
     if (once("buybar")) {
-      var addBtn = document.querySelector(".add-to-cart-button .btn, .product-add-to-cart .btn, .btn-conversion");
-      var nameEl = document.querySelector(".p-detail .p-name, .product-detail h1, .content-inner > h1");
-      var priceEl = document.querySelector(".p-detail .price-final, .product-detail .price-final, .price-final");
+      var addBtn = document.querySelector(".add-to-cart-button");
+      var nameEl = document.querySelector(".p-data-wrapper h1, .p-detail-inner-header h1, .p-detail-inner-header-mobile .h1");
+      var priceEl = document.querySelector(".price-final-holder, .p-price-wrapper .price-final");
       if (addBtn && priceEl) {
         var bar = mark(el("div", "sc-buybar"), "buybar");
         bar.innerHTML =
-          '<span style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40%">' + esc(nameEl ? nameEl.textContent.trim() : "Šablona") + '</span>' +
+          '<span class="sc-buybar__name" style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40%">' + esc(nameEl ? nameEl.textContent.trim() : "Šablona") + '</span>' +
           '<span class="sc-buybar__price">' + esc(priceEl.textContent.trim()) + '</span>' +
-          '<a class="btn btn-conversion sc-buybar__cta" href="#" style="color:#fff;padding:12px 22px;border-radius:var(--sc-r-btn)">Koupit s nasazením</a>';
+          '<button type="button" class="btn btn-conversion sc-buybar__cta" style="color:#fff;padding:12px 22px;border-radius:var(--sc-r-btn)">Koupit s nasazením</button>';
         document.body.appendChild(bar);
-        bar.querySelector(".sc-buybar__cta").addEventListener("click", function (e) {
-          e.preventDefault(); addBtn.click();
-        });
+        bar.querySelector(".sc-buybar__cta").addEventListener("click", function () { addBtn.click(); });
         var io = new IntersectionObserver(function (entries) {
           bar.classList.toggle("sc-buybar--visible", !entries[0].isIntersecting);
         }, { threshold: 0 });
