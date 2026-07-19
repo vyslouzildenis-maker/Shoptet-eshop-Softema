@@ -21,7 +21,8 @@ deploy/
 ## Co ještě nastavit v administraci (ne kódem)
 
 - **Vzhled šablony:** `--color-primary` = bílá, `--color-secondary` = akcent, `--color-tertiary` = mlha (#F3F6FA). Tím se obarví hlavička, tlačítka, ceny i filtry ještě před CSS.
-- **Vypnout carousel banerů** na homepage (kolize K1 — hero řeší `custom.js`).
+- **Vypnout carousel banerů** na homepage (kolize K1 — hero řeší mount `#sc-hero`).
+- **Úvodní stránka:** Vzhled a obsah → *Editor úvodní stránky* → přepnout na HTML/zdrojový kód a vložit celý `homepage-block.html`. Obsahuje mounty `#sc-hero` a `#sc-steps` (nahradí je `custom.js`) + statické sekce se třídami `.sc-*`. Bez mountů se hero NEVKLÁDÁ — proto nikde nekoliduje.
 - **Filtrační parametry** kategorie Šablony: `obor`, `styl` (K…). 
 - **Doplňkový parametr `Demo`** u produktů = URL živého dema (K2). Alternativně `<span data-demo="demo-nora.softema.cz" hidden></span>` do krátkého popisu (funguje i ve výpisu).
 - **FAQ** na homepage: `<details class="sc-faq"><summary>Otázka</summary><p>Odpověď</p></details>` do textu úvodní stránky (K3).

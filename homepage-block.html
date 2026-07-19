@@ -1,0 +1,61 @@
+<!-- ============================================================
+     SOFTEMA — obsah ÚVODNÍ STRÁNKY do editoru Shoptetu
+     Administrace → Vzhled a obsah → Editor úvodní stránky
+     (přepni na „Zdrojový kód / HTML" a vlož CELÉ níže)
+     ------------------------------------------------------------
+     • #sc-hero a #sc-steps jsou MOUNTY — custom.js je nahradí
+       hotovou hero sekcí a bloky „Jak to funguje".
+     • Ostatní sekce jsou statické HTML se třídami .sc-*,
+       které styluje custom.css (edituj texty přímo tady).
+     • Nativní carousel banerů na homepage VYPNI v administraci,
+       ať se nepřekrývá (kolize K1).
+     ============================================================ -->
+
+<!-- 1) HERO (nahradí custom.js) -->
+<div id="sc-hero"></div>
+
+<!-- 2) JAK TO FUNGUJE (nahradí custom.js) -->
+<div id="sc-steps"></div>
+
+<!-- 3) PROČ OD NÁS -->
+<section class="sc-section sc-section--fog">
+  <div class="sc-section__in">
+    <h2 class="sc-h2">Proč šablonu od nás</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:32px">
+      <div style="background:#fff;border:1px solid var(--sc-line);border-radius:var(--sc-r-card);padding:24px">
+        <strong style="font-family:var(--sc-font-head);font-size:18px;display:block;margin-bottom:6px">Certifikovaní Shoptet partneři</strong>
+        <span style="color:var(--sc-steel);font-size:14.5px">Shoptet známe do detailu — víme, co jde a co ne.</span>
+      </div>
+      <div style="background:#fff;border:1px solid var(--sc-line);border-radius:var(--sc-r-card);padding:24px">
+        <strong style="font-family:var(--sc-font-head);font-size:18px;display:block;margin-bottom:6px">Garance doladění zdarma</strong>
+        <span style="color:var(--sc-steel);font-size:14.5px">Nasadíme a doladíme, dokud nebudete spokojeni.</span>
+      </div>
+      <div style="background:#fff;border:1px solid var(--sc-line);border-radius:var(--sc-r-card);padding:24px">
+        <strong style="font-family:var(--sc-font-head);font-size:18px;display:block;margin-bottom:6px">30 dní podpory</strong>
+        <span style="color:var(--sc-steel);font-size:14.5px">Po spuštění jsme tu pro každý dotaz i drobnou úpravu.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4) FAQ (kolize K3 — <details>, bez JS) -->
+<section class="sc-section">
+  <div class="sc-section__in" style="max-width:820px">
+    <h2 class="sc-h2">Časté dotazy</h2>
+    <div style="margin-top:24px">
+      <details class="sc-faq"><summary>Jak dlouho nasazení trvá?</summary><p style="color:var(--sc-steel)">Do 5 pracovních dnů od předání přístupů a podkladů.</p></details>
+      <details class="sc-faq"><summary>Co potřebujete ode mě?</summary><p style="color:var(--sc-steel)">Přístup do administrace Shoptetu, logo a barvy značky. Zbytek je na nás.</p></details>
+      <details class="sc-faq"><summary>Přijdu o svá data nebo produkty?</summary><p style="color:var(--sc-steel)">Ne. Měníme jen vzhled šablony, obsah e-shopu zůstává beze změny.</p></details>
+      <details class="sc-faq"><summary>Můžu si šablonu ještě upravit?</summary><p style="color:var(--sc-steel)">Ano — nabízíme balíčky úprav i design na míru.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- 5) ZÁVĚREČNÉ CTA -->
+<section class="sc-section sc-section--fog">
+  <div class="sc-section__in" style="max-width:820px;text-align:center">
+    <h2 class="sc-h2">Nový vzhled e-shopu do 5 dnů</h2>
+    <p style="color:var(--sc-steel);font-size:17px;margin:0 0 24px">Vyberte šablonu dnes — o zbytek se postaráme my.</p>
+    <a class="btn btn-conversion" href="/sablony/" style="display:inline-flex;align-items:center;gap:10px;color:#fff;padding:15px 28px;border-radius:var(--sc-r-btn)">Vybrat šablonu →</a>
+  </div>
+</section>

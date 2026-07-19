@@ -76,11 +76,15 @@
      HOMEPAGE  (kolize K1 — hero vkládá JS na začátek obsahu)
      ============================================================ */
   function homepage() {
-    var content = document.querySelector(".content-inner, #content, .container");
+    // Deterministické mounty — hero/kroky se vloží JEN tam, kde v editoru
+    // úvodní stránky Shoptetu vložíš prázdné <div id="sc-hero"></div> resp.
+    // <div id="sc-steps"></div>. Žádné slepé vkládání = žádné kolize.
+    var content = document.getElementById("sc-hero") || document.getElementById("sc-steps");
     if (!content) return;
 
     /* --- Hero --- */
-    if (once("hero")) {
+    var heroMount = document.getElementById("sc-hero");
+    if (heroMount && once("hero")) {
       var h = CFG.hero;
       var hero = mark(el("section", "sc-section sc-hero"), "hero");
       hero.innerHTML =
@@ -94,13 +98,14 @@
               '<a class="btn btn-primary" href="' + esc(h.ctaSecondary.href) + '" style="padding:13.5px 26px;border-radius:var(--sc-r-btn)">' + esc(h.ctaSecondary.label) + '</a>' +
             '</div>' +
           '</div>' +
-          '<div class="sc-frame"><div class="sc-frame__bar"><span class="sc-frame__dots"><i></i><i></i><i></i></span><span class="sc-frame__url">demo.softema.cz</span></div><div class="sc-frame__shot" style="height:280px;background:var(--sc-fog)"></div></div>' +
+          '<div class="sc-frame"><div class="sc-frame__bar"><span class="sc-frame__dots"><i></i><i></i><i></i></span><span class="sc-frame__url">demo.softema.cz</span></div><div class="sc-frame__shot" style="height:240px;background:var(--sc-fog)"></div></div>' +
         '</div>';
-      content.insertBefore(hero, content.firstChild);
+      heroMount.replaceWith(hero);
     }
 
     /* --- Jak to funguje --- */
-    if (once("steps")) {
+    var stepsMount = document.getElementById("sc-steps");
+    if (stepsMount && once("steps")) {
       var s = mark(el("section", "sc-section sc-section--fog"), "steps");
       var cards = CFG.steps.map(function (x, i) {
         return '<div style="background:#fff;border:1px solid var(--sc-line);border-radius:var(--sc-r-card);padding:24px;display:flex;flex-direction:column;gap:8px">' +
@@ -110,10 +115,7 @@
       }).join("");
       s.innerHTML = '<div class="sc-section__in"><h2 class="sc-h2">Jak to funguje</h2>' +
         '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:32px">' + cards + '</div></div>';
-      // vloží se před nativní výpis produktů, jinak na konec obsahu
-      var prods = content.querySelector(".products-block, .products");
-      if (prods && prods.parentNode) prods.parentNode.insertBefore(s, prods);
-      else content.appendChild(s);
+      stepsMount.replaceWith(s);
     }
   }
 
@@ -252,11 +254,19 @@
     }
 
     if (isFirstStep && once("cart-trust")) {
-      var cta = document.querySelector(".cart-buttons .btn-conversion, .cart .btn-conversion, a[href*='objednavka']");
-      if (cta) {
+      // 1) primárně pod souhrn (rekapitulace) — spolehlivě existuje
+      var summary = document.querySelector(
+        ".cart-summary, .summary-wrapper, .order-summary, .cart-sidebar, .checkout-box-wrapper");
+      // 2) fallback: k tlačítku Pokračovat (různé buildy Samby)
+      var cta = document.querySelector(
+        ".btn-conversion, .cart-buttons a, a[href*='doprava'], a[href*='objednavka'], .action-buttons a");
+      var host = summary || (cta ? cta.parentNode : null);
+      if (host) {
         var t = mark(el("div", "sc-trust"), "cart-trust");
+        t.style.padding = "14px 0 2px";
         t.innerHTML = CFG.cartTrust.map(function (x) { return "<span>" + esc(x) + "</span>"; }).join("");
-        cta.parentNode.insertBefore(t, cta.nextSibling);
+        if (summary) summary.appendChild(t);
+        else host.insertBefore(t, cta.nextSibling);
       }
     }
   }
@@ -287,7 +297,7 @@
   function run() {
     var type = pageType();
     try {
-      if (type === "homepage") homepage();
+      homepage();                  // mount-based (#sc-hero / #sc-steps) — bezpečné kdekoliv
       if (type === "category") category();
       if (type === "product") product();
       if (type === "cart") cart();

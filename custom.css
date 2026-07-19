@@ -347,15 +347,17 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--sc-acc); }
 .footer-bottom a:hover { color: #fff; }
 .footer-rows h3, .footer-rows strong { color: #fff; }
 
-/* Newsletter blok → CTA pás „konzultace zdarma" */
-.footer-newsletter {
+/* Newsletter blok — POUZE v patičce (scoped, ať neuteče na homepage) */
+.footer-rows .footer-newsletter,
+.footer-bottom .footer-newsletter {
   max-width: none;
   background: var(--sc-acc);
   border-radius: var(--sc-r-card);
   padding: clamp(24px, 4vw, 40px);
   color: #fff;
 }
-.footer-newsletter .btn { background: #fff; color: var(--sc-acc); }
+.footer-rows .footer-newsletter .btn,
+.footer-bottom .footer-newsletter .btn { background: #fff; color: var(--sc-acc); }
 
 /* ---------- 12. FAQ / <details> v textu (kolize K3) ------- */
 .content-inner details.sc-faq,
@@ -381,7 +383,13 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--sc-acc); }
 }
 
 /* ---------- 14. INJEKTOVANÉ SEKCE (.sc-section) ----------- */
-.sc-section { padding: clamp(56px, 8vw, 112px) 0; }
+.sc-section {
+  padding: clamp(56px, 8vw, 112px) 0;
+  position: relative; z-index: 1;
+  background: #fff;
+}
+.sc-hero { background: #fff; }
+.sc-hero .sc-frame__shot { height: 240px; }
 .sc-section__in { max-width: 1280px; margin: 0 auto; padding-inline: clamp(20px, 4vw, 32px); }
 .sc-section--fog { background: var(--sc-fog); }
 .sc-section--ink { background: var(--sc-ink); color: #fff; }
