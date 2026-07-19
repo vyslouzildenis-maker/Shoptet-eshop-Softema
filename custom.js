@@ -1,0 +1,310 @@
+/* ============================================================
+   SOFTEMA — custom vrstva nad šablonou Shoptet Samba
+   custom.js · v1  (vanilla, bez závislostí)
+   ------------------------------------------------------------
+   • spouští se po DOMContentLoaded
+   • každá sekce je idempotentní (guard přes [data-sc])
+   • detekce stránky přes Shoptet dataLayer / <body> třídy
+   • injektované prvky mají prefix .sc-*  (styluje custom.css)
+   • za 1. krokem košíku NEBĚŽÍ žádné JS (jen CSS)
+   ============================================================ */
+(function () {
+  "use strict";
+
+  /* ---------- Konfigurace (edituj tady) ------------------- */
+  var CFG = {
+    hero: {
+      eyebrow: "Šablony s nasazením",
+      title: "Nový vzhled vašeho Shoptet e-shopu.\nDo 5 dnů a bez práce.",
+      text: "Vyberete šablonu, my ji nasadíme. Jste v rukou certifikovaných Shoptet partnerů.",
+      ctaPrimary: { label: "Vybrat šablonu", href: "/sablony/" },
+      ctaSecondary: { label: "Chci design na míru", href: "/design-na-miru/" }
+    },
+    steps: [
+      { t: "Vyberete a zaplatíte", d: "Šablonu i případné úpravy pořídíte online během pár minut." },
+      { t: "Pošlete přístupy", d: "Krátký formulář — přístup do administrace, logo a barvy." },
+      { t: "Nasadíme a doladíme", d: "Šablonu nasadíme na váš e-shop a sladíme s brandem." },
+      { t: "Do 5 dnů hotovo", d: "Zkontrolujete, spustíme. Prvních 30 dní podpora zdarma." }
+    ],
+    // Copy pro prázdné stavy a trust prvky
+    emptyCategory: {
+      title: "Nenašli jste svůj styl?",
+      text: "Uděláme vám design na míru — přesně podle vašeho brandu.",
+      cta: { label: "Design na míru", href: "/design-na-miru/" }
+    },
+    emptyCart: {
+      title: "Košík je prázdný.",
+      text: "Vyberte si šablonu a nový vzhled máte do 5 dnů.",
+      cta: { label: "Prohlédnout šablony", href: "/sablony/" }
+    },
+    cartTrust: ["Garance doladění zdarma", "Podpora 30 dní", "Bezpečná platba"]
+  };
+
+  /* ---------- Utility ------------------------------------- */
+  function el(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function once(key) {
+    if (document.querySelector('[data-sc="' + key + '"]')) return false;
+    return true;
+  }
+  function mark(node, key) { node.setAttribute("data-sc", key); return node; }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+  }); }
+
+  /* Detekce typu stránky. Shoptet plní window.dataLayer i <body> třídy;
+     používáme obojí jako fallback. */
+  function pageType() {
+    var dl = (window.dataLayer || []).reduce(function (acc, x) {
+      if (x && x.shoptet && x.shoptet.pageType) acc = x.shoptet.pageType;
+      return acc;
+    }, null);
+    if (dl) return dl;                       // homepage | category | product | cart | ...
+    var b = document.body.className || "";
+    if (/(^|\s)homepage/.test(b)) return "homepage";
+    if (/category/.test(b)) return "category";
+    if (/product/.test(b)) return "product";
+    if (/cart|ordering/.test(b)) return "cart";
+    return "other";
+  }
+
+  /* ============================================================
+     HOMEPAGE  (kolize K1 — hero vkládá JS na začátek obsahu)
+     ============================================================ */
+  function homepage() {
+    var content = document.querySelector(".content-inner, #content, .container");
+    if (!content) return;
+
+    /* --- Hero --- */
+    if (once("hero")) {
+      var h = CFG.hero;
+      var hero = mark(el("section", "sc-section sc-hero"), "hero");
+      hero.innerHTML =
+        '<div class="sc-section__in" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,56px);align-items:center">' +
+          '<div>' +
+            '<span style="font-size:13px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--sc-acc)">' + esc(h.eyebrow) + '</span>' +
+            '<h1 style="font-family:var(--sc-font-head);font-size:clamp(34px,5vw,60px);font-weight:700;line-height:1.05;letter-spacing:-.5px;margin:12px 0 16px">' + esc(h.title).replace(/\n/g, "<br>") + '</h1>' +
+            '<p style="font-size:18px;color:var(--sc-steel);max-width:460px;margin:0 0 24px">' + esc(h.text) + '</p>' +
+            '<div style="display:flex;gap:12px;flex-wrap:wrap">' +
+              '<a class="btn btn-conversion" href="' + esc(h.ctaPrimary.href) + '" style="display:inline-flex;align-items:center;gap:10px;color:#fff;padding:15px 28px;border-radius:var(--sc-r-btn)">' + esc(h.ctaPrimary.label) + ' →</a>' +
+              '<a class="btn btn-primary" href="' + esc(h.ctaSecondary.href) + '" style="padding:13.5px 26px;border-radius:var(--sc-r-btn)">' + esc(h.ctaSecondary.label) + '</a>' +
+            '</div>' +
+          '</div>' +
+          '<div class="sc-frame"><div class="sc-frame__bar"><span class="sc-frame__dots"><i></i><i></i><i></i></span><span class="sc-frame__url">demo.softema.cz</span></div><div class="sc-frame__shot" style="height:280px;background:var(--sc-fog)"></div></div>' +
+        '</div>';
+      content.insertBefore(hero, content.firstChild);
+    }
+
+    /* --- Jak to funguje --- */
+    if (once("steps")) {
+      var s = mark(el("section", "sc-section sc-section--fog"), "steps");
+      var cards = CFG.steps.map(function (x, i) {
+        return '<div style="background:#fff;border:1px solid var(--sc-line);border-radius:var(--sc-r-card);padding:24px;display:flex;flex-direction:column;gap:8px">' +
+          '<span style="width:36px;height:36px;border-radius:50%;background:var(--sc-acc);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-family:var(--sc-font-head);font-weight:700">' + (i + 1) + '</span>' +
+          '<strong style="font-family:var(--sc-font-head);font-size:18px">' + esc(x.t) + '</strong>' +
+          '<span style="color:var(--sc-steel);font-size:14.5px">' + esc(x.d) + '</span></div>';
+      }).join("");
+      s.innerHTML = '<div class="sc-section__in"><h2 class="sc-h2">Jak to funguje</h2>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:32px">' + cards + '</div></div>';
+      // vloží se před nativní výpis produktů, jinak na konec obsahu
+      var prods = content.querySelector(".products-block, .products");
+      if (prods && prods.parentNode) prods.parentNode.insertBefore(s, prods);
+      else content.appendChild(s);
+    }
+  }
+
+  /* ============================================================
+     KARTA PRODUKTU ve výpisu — „živé okno" + tlačítko Živé demo
+     (kolize K2 — demo URL z hidden spanu v krátkém popisu)
+     ============================================================ */
+  function decorateProductCards(scope) {
+    var cards = (scope || document).querySelectorAll(".products-block .p, .products .p");
+    Array.prototype.forEach.call(cards, function (p) {
+      if (p.getAttribute("data-sc") === "card") return;
+      mark(p, "card");
+
+      // Živé okno kolem náhledu
+      var img = p.querySelector(".p-images, .image");
+      if (img && !img.closest(".sc-frame")) {
+        var frame = el("div", "sc-frame");
+        var demo = p.querySelector("[data-demo]");
+        var url = demo ? demo.getAttribute("data-demo") : "demo.softema.cz";
+        frame.appendChild(el("div", "sc-frame__bar",
+          '<span class="sc-frame__dots"><i></i><i></i></span><span class="sc-frame__url">' + esc(url) + '</span>'));
+        var shot = el("div", "sc-frame__shot");
+        img.parentNode.insertBefore(frame, img);
+        shot.appendChild(img);
+        frame.appendChild(shot);
+      }
+
+      // Tlačítko Živé demo z data-demo
+      var demoSpan = p.querySelector("[data-demo]");
+      if (demoSpan) {
+        var href = demoSpan.getAttribute("data-demo");
+        var actions = p.querySelector(".p-bottom, .p-in") || p;
+        var a = el("a", "btn btn-primary sc-demo",
+          "Živé demo");
+        a.href = href.indexOf("http") === 0 ? href : "https://" + href;
+        a.target = "_blank"; a.rel = "noopener";
+        a.style.marginTop = "8px";
+        actions.appendChild(a);
+        demoSpan.setAttribute("hidden", "");
+      }
+    });
+  }
+
+  /* ============================================================
+     KATEGORIE — prázdný výsledek filtru (kolize K4)
+     ============================================================ */
+  function category() {
+    decorateProductCards();
+    var list = document.querySelector(".products-block, .products");
+    var hasItems = list && list.querySelector(".p");
+    var systemEmpty = document.querySelector(".products-empty, .no-products");
+    if (!hasItems && once("empty-cat")) {
+      var c = CFG.emptyCategory;
+      var box = mark(el("div", "sc-empty"), "empty-cat");
+      box.innerHTML =
+        '<strong style="font-family:var(--sc-font-head);font-size:22px">' + esc(c.title) + '</strong>' +
+        '<p style="color:var(--sc-steel);margin:0;max-width:420px">' + esc(c.text) + '</p>' +
+        '<a class="btn btn-conversion" href="' + esc(c.cta.href) + '" style="color:#fff;padding:13px 24px;border-radius:var(--sc-r-btn)">' + esc(c.cta.label) + ' →</a>';
+      var host = systemEmpty || list || document.querySelector(".content-inner");
+      if (host) host.parentNode ? host.parentNode.insertBefore(box, host.nextSibling) : host.appendChild(box);
+    }
+  }
+
+  /* ============================================================
+     DETAIL PRODUKTU — Živé demo z parametru + sticky lišta
+     ============================================================ */
+  function product() {
+    // Tlačítko Živé demo z doplňkového parametru „Demo"
+    if (once("detail-demo")) {
+      var rows = document.querySelectorAll(".detail-parameters tr, .product-parameters tr, .parameters tr");
+      Array.prototype.forEach.call(rows, function (tr) {
+        var label = (tr.textContent || "").toLowerCase();
+        if (label.indexOf("demo") !== -1) {
+          var link = tr.querySelector("a");
+          var url = link ? link.href : (tr.querySelector("td:last-child") || {}).textContent;
+          if (url) {
+            var host = document.querySelector(".p-detail .price-final, .product-detail .prices") || document.querySelector(".p-detail");
+            if (host) {
+              var a = mark(el("a", "btn btn-primary sc-demo", "Živé demo →"), "detail-demo");
+              a.href = String(url).indexOf("http") === 0 ? url : "https://" + String(url).trim();
+              a.target = "_blank"; a.rel = "noopener";
+              a.style.marginTop = "12px"; a.style.display = "inline-flex";
+              host.parentNode.insertBefore(a, host.nextSibling);
+            }
+          }
+          tr.style.display = "none";
+        }
+      });
+    }
+
+    // Sticky nákupní lišta (hlavně mobil)
+    if (once("buybar")) {
+      var addBtn = document.querySelector(".add-to-cart-button .btn, .product-add-to-cart .btn, .btn-conversion");
+      var nameEl = document.querySelector(".p-detail .p-name, .product-detail h1, .content-inner > h1");
+      var priceEl = document.querySelector(".p-detail .price-final, .product-detail .price-final, .price-final");
+      if (addBtn && priceEl) {
+        var bar = mark(el("div", "sc-buybar"), "buybar");
+        bar.innerHTML =
+          '<span style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40%">' + esc(nameEl ? nameEl.textContent.trim() : "Šablona") + '</span>' +
+          '<span class="sc-buybar__price">' + esc(priceEl.textContent.trim()) + '</span>' +
+          '<a class="btn btn-conversion sc-buybar__cta" href="#" style="color:#fff;padding:12px 22px;border-radius:var(--sc-r-btn)">Koupit s nasazením</a>';
+        document.body.appendChild(bar);
+        bar.querySelector(".sc-buybar__cta").addEventListener("click", function (e) {
+          e.preventDefault(); addBtn.click();
+        });
+        var io = new IntersectionObserver(function (entries) {
+          bar.classList.toggle("sc-buybar--visible", !entries[0].isIntersecting);
+        }, { threshold: 0 });
+        io.observe(addBtn);
+      }
+    }
+  }
+
+  /* ============================================================
+     KOŠÍK — 1. KROK: trust prvky u CTA + prázdný stav
+     (za 1. krokem už žádné JS)
+     ============================================================ */
+  function cart() {
+    // pouze první krok — pozná se dle nepřítomnosti .ordering-process
+    var isFirstStep = !document.querySelector(".ordering-process");
+    var isEmpty = document.querySelector(".cart-empty, .cart-emptied") ||
+      !document.querySelector(".cart-table .removeItem, .cart-table tbody tr");
+
+    if (isEmpty && once("empty-cart")) {
+      var c = CFG.emptyCart;
+      var host = document.querySelector(".cart-empty, .cart-emptied, .content-inner");
+      if (host) {
+        var box = mark(el("div", "sc-empty"), "empty-cart");
+        box.innerHTML =
+          '<strong style="font-family:var(--sc-font-head);font-size:22px">' + esc(c.title) + '</strong>' +
+          '<p style="color:var(--sc-steel);margin:0">' + esc(c.text) + '</p>' +
+          '<a class="btn btn-conversion" href="' + esc(c.cta.href) + '" style="color:#fff;padding:13px 24px;border-radius:var(--sc-r-btn)">' + esc(c.cta.label) + ' →</a>';
+        host.appendChild(box);
+      }
+      return;
+    }
+
+    if (isFirstStep && once("cart-trust")) {
+      var cta = document.querySelector(".cart-buttons .btn-conversion, .cart .btn-conversion, a[href*='objednavka']");
+      if (cta) {
+        var t = mark(el("div", "sc-trust"), "cart-trust");
+        t.innerHTML = CFG.cartTrust.map(function (x) { return "<span>" + esc(x) + "</span>"; }).join("");
+        cta.parentNode.insertBefore(t, cta.nextSibling);
+      }
+    }
+  }
+
+  /* ============================================================
+     Před/po slider — použije se všude, kde je .sc-ba v obsahu
+     [SHOPTET vloží prázdný <div class="sc-ba" data-before data-after>]
+     ============================================================ */
+  function beforeAfter() {
+    var nodes = document.querySelectorAll(".sc-ba:not([data-sc])");
+    Array.prototype.forEach.call(nodes, function (node) {
+      mark(node, "ba");
+      var before = node.getAttribute("data-before");
+      var after = node.getAttribute("data-after");
+      node.style.position = "relative";
+      node.style.overflow = "hidden";
+      node.innerHTML =
+        '<img src="' + esc(after) + '" alt="po" style="display:block;width:100%">' +
+        '<div class="sc-ba__before" style="position:absolute;inset:0;width:50%;overflow:hidden;border-right:2px solid #fff"><img src="' + esc(before) + '" alt="před" style="display:block;height:100%;width:auto;max-width:none"></div>' +
+        '<input class="sc-ba__range" type="range" min="0" max="100" value="50" aria-label="Porovnat před a po" style="position:absolute;left:0;right:0;bottom:12px;width:60%;margin:0 auto">';
+      var clip = node.querySelector(".sc-ba__before");
+      var range = node.querySelector(".sc-ba__range");
+      range.addEventListener("input", function () { clip.style.width = range.value + "%"; });
+    });
+  }
+
+  /* ---------- Router -------------------------------------- */
+  function run() {
+    var type = pageType();
+    try {
+      if (type === "homepage") homepage();
+      if (type === "category") category();
+      if (type === "product") product();
+      if (type === "cart") cart();
+      beforeAfter();               // kdekoliv v obsahu
+    } catch (e) {
+      if (window.console) console.warn("[softema] init:", e);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", run);
+  } else {
+    run();
+  }
+
+  // Shoptet překresluje výpis přes AJAX (filtr, stránkování) —
+  // znovu ozdobíme karty, když se DOM změní.
+  document.addEventListener("ShoptetDeferredContentLoaded", run);
+  document.addEventListener("ShoptetProductListLoaded", function () { decorateProductCards(); });
+})();

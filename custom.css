@@ -1,0 +1,404 @@
+/* ============================================================
+   SOFTEMA — custom vrstva nad šablonou Shoptet Samba
+   custom.css · v1
+   ------------------------------------------------------------
+   Restyluje EXISTUJÍCÍ selektory Samby. Nezakládá vlastní DOM
+   kromě prvků s prefixem .sc-*, které injektuje custom.js.
+   Barvy se řídí primárně proměnnými Samby (viz blok 1) —
+   custom.css jen dolaďuje to, co proměnné nepokryjí.
+   ============================================================ */
+
+/* ---------- 1. TOKENY ------------------------------------- */
+:root {
+  /* Brand — po dodání loga nahraď akcent přesným hexem */
+  --sc-acc:        #0E62D9;
+  --sc-acc-hover:  #0B4FB0;
+  --sc-ink:        #0F1D2B;
+  --sc-steel:      #4A5C6E;
+  --sc-muted:      #94A6B8;
+  --sc-fog:        #F3F6FA;
+  --sc-line:       #DFE7EF;
+  --sc-paper:      #FFFFFF;
+  --sc-success:    #1F7A3D;
+
+  --sc-r-btn:  10px;
+  --sc-r-card: 16px;
+  --sc-shadow: 0 16px 32px -16px rgba(15,29,43,.20);
+
+  --sc-font-head: 'Bricolage Grotesque', var(--template-font, sans-serif);
+  --sc-font-body: 'Figtree', var(--template-font, sans-serif);
+
+  /* Propíšeme do proměnných Samby (fallback, pokud nelze
+     nastavit v administraci u „Vzhled šablony") */
+  --color-secondary:        var(--sc-acc);
+  --color-secondary-hover:  var(--sc-acc-hover);
+  --colors-surface-secondary: var(--sc-fog);
+  --colors-foregrounds-content-primary:   var(--sc-ink);
+  --colors-foregrounds-content-secondary: var(--sc-steel);
+  --colors-foregrounds-borders-secondary: var(--sc-line);
+  --colors-forms-border: var(--sc-line);
+}
+
+/* ---------- 2. TYPOGRAFIE (kolize K5) --------------------- */
+body,
+.p,
+input, select, textarea, button {
+  font-family: var(--sc-font-body);
+}
+body { font-size: 16px; line-height: 1.6; color: var(--sc-ink); }
+
+h1, h2, h3, h4,
+.category-title,
+.homepage-group-title,
+.p-detail .p-name,
+.products-block .name {
+  font-family: var(--sc-font-head);
+  letter-spacing: -0.3px;
+  color: var(--sc-ink);
+}
+
+a { color: var(--sc-acc); }
+a:hover { color: var(--sc-acc-hover); }
+
+::selection { background: rgba(14,98,217,.14); }
+
+/* Viditelný focus napříč webem */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid var(--sc-acc);
+  outline-offset: 2px;
+}
+
+/* ---------- 3. TLAČÍTKA ----------------------------------- */
+.btn {
+  border-radius: var(--sc-r-btn);
+  font-family: var(--sc-font-body);
+  font-weight: 600;
+  transition: background .2s, color .2s, border-color .2s, transform .15s;
+}
+
+/* Primární konverzní CTA „Koupit s nasazením" */
+.btn-conversion,
+.add-to-cart-button .btn,
+.product-add-to-cart .btn {
+  background: var(--sc-acc);
+  border-color: var(--sc-acc);
+  color: #fff;
+  min-height: 52px;
+  padding-inline: 28px;
+}
+.btn-conversion:hover,
+.add-to-cart-button .btn:hover,
+.product-add-to-cart .btn:hover {
+  background: var(--sc-acc-hover);
+  border-color: var(--sc-acc-hover);
+  color: #fff;
+}
+.btn-conversion .icon,
+.btn-conversion svg { transition: transform .2s; }
+.btn-conversion:hover .icon,
+.btn-conversion:hover svg { transform: translateX(3px); }
+
+/* Sekundární obrysové tlačítko „Živé demo" */
+.btn-primary,
+.btn-secondary {
+  background: #fff;
+  border: 1.5px solid var(--sc-acc);
+  color: var(--sc-acc);
+}
+.btn-primary:hover,
+.btn-secondary:hover {
+  background: var(--sc-acc);
+  color: #fff;
+}
+
+.btn--link { color: var(--sc-acc); }
+.btn--link:hover { color: var(--sc-acc-hover); }
+
+/* ---------- 4. HLAVIČKA ----------------------------------- */
+#header,
+.header-top,
+#navigation,
+.navigation-buttons { background: var(--sc-paper); }
+
+#header { border-bottom: 1px solid var(--sc-line); }
+
+#navigation { border-top: 1px solid var(--sc-line); }
+#navigation .menu-level-1 > li > a { font-weight: 500; color: var(--sc-ink); }
+#navigation .menu-level-1 > li > a:hover,
+#navigation .menu-level-1 > li.active > a { color: var(--sc-acc); }
+
+/* Hledání jako pill */
+.header-searching input[type="text"],
+.header-searching .form-control {
+  border-radius: 999px;
+  background: var(--sc-fog);
+  border: 1px solid var(--sc-line);
+  height: 44px;
+  padding-inline: 20px;
+}
+
+/* Počítadlo košíku */
+.cart-count,
+.header-cart .count { background: var(--sc-acc); color: #fff; }
+
+/* ---------- 5. KARTA PRODUKTU (.p) ------------------------ */
+/* Sjednocený styl na homepage i v kategorii */
+.p {
+  border: 1px solid var(--sc-line);
+  border-radius: var(--sc-r-card);
+  background: #fff;
+  overflow: hidden;
+  text-align: left;
+  transition: transform .2s, box-shadow .2s;
+}
+.p:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sc-shadow);
+}
+.p .p-in { padding: 18px; }
+.p .p-images { border-bottom: 1px solid var(--sc-line); }
+.p .name,
+.p .p-name {
+  font-family: var(--sc-font-head);
+  font-size: 19px;
+  font-weight: 600;
+}
+.p .price,
+.p .price-final {
+  color: var(--sc-acc);
+  font-weight: 700;
+  font-size: 19px;
+}
+
+/* „Živé okno" — rám kolem náhledu (obal .sc-frame přidá JS,
+   fallback: přímo na .p-images) */
+.sc-frame {
+  border: 1px solid var(--sc-line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.sc-frame__bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px;
+  background: var(--sc-fog);
+  border-bottom: 1px solid var(--sc-line);
+  font-size: 12px; color: var(--sc-steel);
+}
+.sc-frame__dots { display: flex; gap: 4px; }
+.sc-frame__dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--sc-line); }
+.sc-frame__url {
+  flex: 1; background: #fff; border: 1px solid var(--sc-line);
+  border-radius: 999px; padding: 2.5px 11px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* hover-scroll dlouhého screenshotu */
+.sc-frame__shot { overflow: hidden; }
+.sc-frame__shot img {
+  display: block; width: 100%;
+  transition: transform 4s ease;
+}
+.sc-frame:hover .sc-frame__shot img { transform: translateY(calc(-100% + 200px)); }
+
+/* Pilulka „vč. nasazení" u ceny */
+.sc-pill {
+  display: inline-flex; align-items: center;
+  font-size: 12px; font-weight: 600; color: var(--sc-steel);
+  border: 1px solid var(--sc-line); border-radius: 999px;
+  padding: 2px 10px; white-space: nowrap;
+}
+
+/* Oborový badge */
+.sc-badge {
+  display: inline-flex; align-items: center;
+  font-size: 12px; font-weight: 600;
+  background: var(--sc-fog); border: 1px solid var(--sc-line);
+  border-radius: 999px; padding: 3px 10px; color: var(--sc-ink);
+}
+
+/* ---------- 6. ŠTÍTKY / FLAGY ----------------------------- */
+.flag,
+.flag-sale, .flag-new, .flag-tip {
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: .4px;
+}
+
+/* ---------- 7. KATEGORIE + FILTR -------------------------- */
+.category-title,
+.content-inner > h1 { font-size: clamp(30px, 4vw, 44px); }
+
+#category-content .filter,
+.filter-bg,
+.category-filter {
+  background: var(--sc-fog);
+  border: 1px solid var(--sc-line);
+  border-radius: var(--sc-r-card);
+}
+.filter-slider .ui-slider-range,
+.noUi-connect { background: var(--sc-acc); }
+.filter-slider .ui-slider-handle,
+.noUi-handle { border-color: var(--sc-acc); }
+
+/* Stránkování */
+.pagination .active,
+.pagination a:hover { background: var(--sc-acc); color: #fff; border-color: var(--sc-acc); }
+
+/* ---------- 8. DETAIL PRODUKTU ---------------------------- */
+.p-detail .p-detail-inner { gap: clamp(28px, 4vw, 56px); }
+.p-detail .price-final,
+.p-detail .price { color: var(--sc-acc); }
+
+/* Checklist „Co je v ceně" (blok .sc-included v popisu) */
+.sc-included { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.sc-included li { display: flex; gap: 12px; align-items: flex-start; }
+.sc-included li::before {
+  content: "✓"; flex: none;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--sc-acc); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px;
+}
+
+/* Taby detailu */
+.p-detail .tabs .tab.active,
+.detail-tabs .active { color: var(--sc-acc); border-bottom-color: var(--sc-acc); }
+
+/* Sticky nákupní lišta (přidá product.js) */
+.sc-buybar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+  background: #fff; border-top: 1px solid var(--sc-line);
+  box-shadow: 0 -8px 24px -16px rgba(15,29,43,.3);
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px clamp(16px, 4vw, 32px);
+  transform: translateY(100%); transition: transform .25s;
+}
+.sc-buybar--visible { transform: translateY(0); }
+.sc-buybar__price { font-family: var(--sc-font-head); font-weight: 700; font-size: 20px; color: var(--sc-acc); }
+.sc-buybar__cta { margin-left: auto; }
+
+/* ---------- 9. KOŠÍK -------------------------------------- */
+.cart-table th { color: var(--sc-steel); }
+.cart-table td, .cart-table th { border-color: var(--sc-line); }
+
+.summary-wrapper,
+.checkout-box-wrapper,
+.order-summary {
+  background: var(--sc-fog);
+  border: 1px solid var(--sc-line);
+  border-radius: var(--sc-r-card);
+}
+.summary-total,
+.order-summary .total { color: var(--sc-acc); font-family: var(--sc-font-head); }
+
+/* Ovladač množství */
+.quantity input,
+.spinbox input { background: var(--sc-fog); border-color: var(--sc-line); border-radius: 8px; }
+
+/* Kroky 2+ objednávky: pouze barvy a typografie */
+.ordering-process .co-box {
+  border: 1px solid var(--sc-line);
+  border-radius: var(--sc-r-card);
+}
+.ordering-process .co-box-header { color: var(--sc-ink); font-family: var(--sc-font-head); }
+.ordering-process .selected,
+.ordering-process input:checked + label {
+  border-color: var(--sc-acc);
+  background: var(--sc-fog);
+}
+.ordering-process .price-free,
+.shipping-free { color: var(--sc-success); font-weight: 700; }
+
+/* Trust prvky u CTA v košíku (přidá global.js) */
+.sc-trust { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; }
+.sc-trust span { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--sc-steel); }
+.sc-trust span::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--sc-success); }
+
+/* ---------- 10. FORMULÁŘE --------------------------------- */
+input:not([type="checkbox"]):not([type="radio"]),
+select, textarea,
+.form-control {
+  min-height: 48px;
+  border: 1px solid var(--sc-line);
+  border-radius: var(--sc-r-btn);
+  padding: 12px 16px;
+  color: var(--sc-ink);
+}
+input:focus, select:focus, textarea:focus, .form-control:focus {
+  border-color: var(--sc-acc);
+  box-shadow: 0 0 0 3px rgba(14,98,217,.15);
+  outline: none;
+}
+input[type="checkbox"], input[type="radio"] { accent-color: var(--sc-acc); }
+
+/* ---------- 11. PATIČKA ----------------------------------- */
+.footer-rows,
+.footer-bottom {
+  background: var(--sc-ink);
+  color: #C4D0DC;
+}
+.footer-rows a,
+.footer-bottom a { color: #C4D0DC; }
+.footer-rows a:hover,
+.footer-bottom a:hover { color: #fff; }
+.footer-rows h3, .footer-rows strong { color: #fff; }
+
+/* Newsletter blok → CTA pás „konzultace zdarma" */
+.footer-newsletter {
+  max-width: none;
+  background: var(--sc-acc);
+  border-radius: var(--sc-r-card);
+  padding: clamp(24px, 4vw, 40px);
+  color: #fff;
+}
+.footer-newsletter .btn { background: #fff; color: var(--sc-acc); }
+
+/* ---------- 12. FAQ / <details> v textu (kolize K3) ------- */
+.content-inner details.sc-faq,
+.sc-faq {
+  border-bottom: 1px solid var(--sc-line);
+}
+.sc-faq > summary {
+  list-style: none; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 18px 0; font-weight: 600; font-size: 17px;
+}
+.sc-faq > summary::-webkit-details-marker { display: none; }
+.sc-faq > summary::after { content: "+"; color: var(--sc-acc); font-size: 22px; }
+.sc-faq[open] > summary::after { content: "–"; }
+
+/* ---------- 13. PRÁZDNÉ STAVY (K4) ------------------------ */
+.sc-empty {
+  border: 2px dashed var(--sc-line);
+  border-radius: var(--sc-r-card);
+  text-align: center;
+  padding: clamp(32px, 5vw, 56px);
+  display: grid; gap: 12px; justify-items: center;
+}
+
+/* ---------- 14. INJEKTOVANÉ SEKCE (.sc-section) ----------- */
+.sc-section { padding: clamp(56px, 8vw, 112px) 0; }
+.sc-section__in { max-width: 1280px; margin: 0 auto; padding-inline: clamp(20px, 4vw, 32px); }
+.sc-section--fog { background: var(--sc-fog); }
+.sc-section--ink { background: var(--sc-ink); color: #fff; }
+.sc-h2 { font-family: var(--sc-font-head); font-size: clamp(26px, 3vw, 34px); font-weight: 700; text-align: center; margin: 0 0 12px; }
+
+/* ---------- 15. POHYB / PŘÍSTUPNOST ----------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+  .sc-frame:hover .sc-frame__shot img { transform: none; }
+}
+
+/* ---------- 16. MOBIL ------------------------------------- */
+@media (max-width: 767px) {
+  .sc-buybar { display: flex; }
+  .sc-section { padding: 56px 0; }
+  .footer-newsletter { text-align: center; }
+}
+@media (min-width: 768px) {
+  /* sticky lišta hlavně na mobilu — na desktopu jen v detailu, řídí product.js */
+}
