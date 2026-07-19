@@ -201,17 +201,75 @@
       }
     }
 
-    // Tlačítko „Živé demo" + pilulka „vč. nasazení" pod cenou
-    if (once("detail-demo")) {
+    // Badge chips (Obor / Styl) nad názvem
+    if (once("chips")) {
+      var chipVals = [];
+      Array.prototype.forEach.call(document.querySelectorAll(".detail-parameters .detail-parameter"), function (p) {
+        var t = (p.textContent || "").toLowerCase();
+        if (t.indexOf("obor") !== -1 || t.indexOf("styl") !== -1) {
+          var v = p.querySelector(".detail-parameter-value, span:last-child");
+          if (v) chipVals.push(v.textContent.trim());
+        }
+      });
+      var dattr = document.querySelector(".p-short-description [data-obor], .p-detail [data-obor]");
+      if (!chipVals.length && dattr) {
+        if (dattr.getAttribute("data-obor")) chipVals.push(dattr.getAttribute("data-obor"));
+        if (dattr.getAttribute("data-styl")) chipVals.push(dattr.getAttribute("data-styl"));
+      }
+      var h1 = document.querySelector(".p-data-wrapper h1");
+      if (chipVals.length && h1) {
+        var chips = mark(el("div", "sc-chips"), "chips");
+        chips.innerHTML = chipVals.map(function (v) { return '<span class="sc-badge">' + esc(v) + "</span>"; }).join("");
+        h1.parentNode.insertBefore(chips, h1);
+      }
+    }
+
+    // Pilulka „vč. nasazení" za cenou + poznámky pod cenou
+    if (once("price-extras")) {
       var priceWrap = document.querySelector(".p-price-wrapper");
       if (priceWrap) {
-        var box = mark(el("div", "sc-detail-demo"), "detail-demo");
-        var pill = '<span class="sc-pill">vč. nasazení</span>';
-        var demoBtn = demoHref
-          ? '<a class="btn btn-primary sc-demo" href="' + esc(demoHref) + '" target="_blank" rel="noopener">Živé demo →</a>'
-          : "";
-        box.innerHTML = demoBtn + pill;
-        priceWrap.parentNode.insertBefore(box, priceWrap.nextSibling);
+        var priceFinal = priceWrap.querySelector(".price-final");
+        if (priceFinal && !priceWrap.querySelector(".sc-pill")) {
+          var pill = el("span", "sc-pill", "vč. nasazení");
+          priceFinal.parentNode.insertBefore(pill, priceFinal.nextSibling);
+        }
+        var lines = mark(el("div", "sc-buy-lines"), "price-extras");
+        lines.innerHTML =
+          '<span class="sc-line-note">Konečná cena — nejsme plátci DPH.</span>' +
+          '<span class="sc-line-avail">Ihned k nasazení — hotovo do 5 pracovních dnů</span>';
+        priceWrap.parentNode.insertBefore(lines, priceWrap.nextSibling);
+      }
+    }
+
+    // „Živé demo" vedle CTA + přejmenování hlavního tlačítka
+    if (once("buyrow")) {
+      var addBtn0 = document.querySelector(".add-to-cart-button");
+      if (addBtn0) {
+        var icon = addBtn0.querySelector("i");
+        addBtn0.setAttribute("aria-label", "Koupit s nasazením");
+        addBtn0.innerHTML = (icon ? icon.outerHTML : "") + "Koupit s nasazením";
+        if (demoHref) {
+          var host = addBtn0.closest(".add-to-cart") || addBtn0.parentNode;
+          var demo2 = el("a", "btn btn-primary sc-demo-side", "Živé demo");
+          demo2.href = demoHref; demo2.target = "_blank"; demo2.rel = "noopener";
+          host.appendChild(demo2);
+        }
+      }
+    }
+
+    // „Co je v ceně" jako karta pod nákupním blokem
+    if (once("included-card")) {
+      var incl = document.querySelector(".basic-description ul.sc-included, .description-inner ul.sc-included");
+      var toCart = document.querySelector(".p-to-cart-block") || document.querySelector(".add-to-cart");
+      if (incl && toCart) {
+        var heading = incl.previousElementSibling;
+        var card = mark(el("div", "sc-included-card"), "included-card");
+        card.appendChild(el("strong", "sc-included-title", "Co je v ceně"));
+        card.appendChild(incl);
+        if (heading && /co je v ceně/i.test(heading.textContent || "")) heading.remove();
+        toCart.parentNode.insertBefore(card, toCart.nextSibling);
+        var rea = el("p", "sc-reassure", "Bezpečná platba kartou i převodem · faktura samozřejmostí");
+        card.parentNode.insertBefore(rea, card.nextSibling);
       }
     }
 

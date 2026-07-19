@@ -215,6 +215,20 @@ textarea:focus-visible,
 .sc-detail-demo { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 12px 0 4px; }
 .sc-detail-demo .sc-demo { padding: 11px 20px; border-radius: var(--sc-r-btn); }
 
+/* Nákupní blok detailu — chips, cena, řádky, demo, karta v ceně */
+.sc-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.p-price-wrapper { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.sc-buy-lines { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 6px; }
+.sc-line-note { font-size: 13.5px; color: var(--sc-steel); }
+.sc-line-avail { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--sc-success); }
+.sc-line-avail::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--sc-success); }
+.add-to-cart { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.sc-demo-side { padding: 14px 24px; border-radius: var(--sc-r-btn); display: inline-flex; align-items: center; white-space: nowrap; }
+.sc-included-card { background: var(--sc-fog); border: 1px solid var(--sc-line); border-radius: var(--sc-r-card); padding: 24px 28px; margin-top: 20px; }
+.sc-included-title { font-family: var(--sc-font-head); font-size: 20px; display: block; margin-bottom: 14px; }
+.sc-included-card .sc-included li::before { background: transparent; color: var(--sc-success); font-size: 16px; width: auto; height: auto; }
+.sc-reassure { font-size: 13.5px; color: var(--sc-steel); margin: 12px 2px 0; }
+
 /* Pilulka „vč. nasazení" u ceny */
 .sc-pill {
   display: inline-flex; align-items: center;
@@ -385,17 +399,20 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--sc-acc); }
 .footer-bottom a:hover { color: #fff; }
 .footer-rows h3, .footer-rows strong { color: #fff; }
 
-/* Newsletter blok — POUZE v patičce (scoped, ať neuteče na homepage) */
-.footer-rows .footer-newsletter,
-.footer-bottom .footer-newsletter {
-  max-width: none;
-  background: var(--sc-acc);
+/* Newsletter blok — decentní (světlé pozadí, akcent jen na tlačítku) */
+.footer-newsletter {
+  max-width: 640px; margin-left: auto; margin-right: auto;
+  background: var(--sc-fog);
+  border: 1px solid var(--sc-line);
   border-radius: var(--sc-r-card);
-  padding: clamp(24px, 4vw, 40px);
-  color: #fff;
+  padding: clamp(20px, 3vw, 32px);
+  color: var(--sc-ink);
 }
-.footer-rows .footer-newsletter .btn,
-.footer-bottom .footer-newsletter .btn { background: #fff; color: var(--sc-acc); }
+.footer-newsletter .btn {
+  background: var(--sc-acc); color: #fff;
+  border-radius: var(--sc-r-btn);
+}
+.footer-newsletter .btn:hover { background: var(--sc-acc-hover); color: #fff; }
 
 /* ---------- 12. FAQ / <details> v textu (kolize K3) ------- */
 .content-inner details.sc-faq,
